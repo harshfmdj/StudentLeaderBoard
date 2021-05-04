@@ -3,6 +3,8 @@ package com.harsh.studentapp.users.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,9 +20,6 @@ import com.harsh.studentapp.users.exception.ResourceNotFoundException;
 import com.harsh.studentapp.users.models.User;
 import com.harsh.studentapp.users.repository.UserRepository;
 
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
 
 
 @RestController
@@ -40,16 +39,16 @@ public class UserController {
 	// get user by id
 	@GetMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+	 @Cacheable(value="user",key="#userId")
 	public User getUserById(@PathVariable (value = "id") long userId) {
 		return this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));
 	}
-
 	
 	// update user
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-	@Cacheable(value="user", key="#id")
+    @CachePut(value="user", key="#userId")
 	public User updateUser(@RequestBody User user, @PathVariable ("id") long userId) {
 		 User existingUser = this.userRepository.findById(userId)
 			.orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));
@@ -61,7 +60,7 @@ public class UserController {
 	// delete user by id
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-	@Cacheable(value="user", key="#id")
+	@CacheEvict(value="user", key="#userId")
 	public ResponseEntity<User> deleteUser(@PathVariable ("id") long userId){
 		 User existingUser = this.userRepository.findById(userId)
 					.orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));

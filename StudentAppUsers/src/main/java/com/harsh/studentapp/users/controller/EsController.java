@@ -1,4 +1,5 @@
 package com.harsh.studentapp.users.controller;
+
 import java.io.IOException;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -32,16 +33,14 @@ import io.searchbox.core.Update;
 public class EsController {
 	@Autowired
 	private Environment env;
-	
-	
+
 	JestClient client = null;
 
 	public JestClient getClient() {
 		if (this.client == null) {
 			JestClientFactory factory = new JestClientFactory();
-			factory.setHttpClientConfig(new HttpClientConfig.Builder(
-					env.getProperty("bezkoder.elastic.link"))
-							.multiThreaded(true).defaultMaxTotalConnectionPerRoute(2).maxTotalConnection(10).build());
+			factory.setHttpClientConfig(new HttpClientConfig.Builder(env.getProperty("bezkoder.elastic.link"))
+					.multiThreaded(true).defaultMaxTotalConnectionPerRoute(2).maxTotalConnection(10).build());
 			this.client = factory.getObject();
 			return factory.getObject();
 		}
@@ -51,7 +50,7 @@ public class EsController {
 
 	@PostMapping("/save")
 	public String saveUser(@RequestBody User user) throws IOException {
-	
+
 		JestClient client = this.getClient();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode userNode = mapper.createObjectNode().put("name", user.getUsername()).put("email", user.getEmail());
@@ -71,7 +70,7 @@ public class EsController {
 
 	@PutMapping("/update/{id}")
 	public String updateUser(@PathVariable final String id, @RequestBody User user) throws IOException {
-	
+
 		JestClient client = this.getClient();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode userNode = mapper.createObjectNode().put("name", user.getUsername()).put("email", user.getEmail());
@@ -82,7 +81,7 @@ public class EsController {
 
 	@DeleteMapping("/delete/{id}")
 	public String deleteUser(@PathVariable final String id) throws IOException {
-	
+
 		JestClient client = this.getClient();
 
 		JestResult deleteResult = client.execute(new Delete.Builder(id).index("hes_user").type("user").build());

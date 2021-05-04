@@ -12,7 +12,7 @@ import com.harsh.studentapp.users.models.User;
 import com.harsh.studentapp.users.repository.UserRepository;
 
 @Service
-@CacheConfig(cacheNames= {"User"})
+@CacheConfig(cacheNames= {"user"})
 public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	UserRepository userRepository;

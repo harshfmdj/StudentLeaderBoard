@@ -3,6 +3,7 @@ package com.harsh.studentapp.leaderboard.contoller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,10 @@ import com.harsh.studentapp.leaderboard.service.MarksService;
 public class MarksController {
 	@Autowired  
 	MarksService marksService;  
+	@Autowired
+    private KafkaTemplate<String, Marks> kafkaTemplate;
+
+    private static final String TOPIC = "Kafka_Example_json";
 	
 	@GetMapping("/Marks")  
 	private List<Marks> getAllMarks()   
@@ -34,18 +39,22 @@ public class MarksController {
 	private void deleteBook(@PathVariable("marksid") int marksid)   
 	{  
       marksService.delete(marksid);  
+      kafkaTemplate.send(TOPIC, marksService.getMarksById(marksid));
+      
 	}  
 	@PostMapping("/marks")  
 	private int saveBook(@RequestBody Marks marks)   
 	{  
 	marksService.saveOrUpdate(marks);  
+	kafkaTemplate.send(TOPIC, marks);
 	return marks.getMarksid();  
 	}  
 	@PutMapping("/marks")  
-	private Marks update(@RequestBody Marks Marks)   
+	private Marks update(@RequestBody Marks marks)   
 	{  
-	marksService.saveOrUpdate(Marks);  
-	return Marks;  
+	marksService.saveOrUpdate(marks);  
+	kafkaTemplate.send(TOPIC, marks);
+	return marks;  
 	}  
 
 	
