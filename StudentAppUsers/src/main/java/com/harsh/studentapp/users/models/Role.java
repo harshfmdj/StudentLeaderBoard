@@ -1,9 +1,10 @@
 package com.harsh.studentapp.users.models;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.persistence.*;
 
-@Entity
-@Table(name = "roles")
+@Document("role")
 public class Role {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

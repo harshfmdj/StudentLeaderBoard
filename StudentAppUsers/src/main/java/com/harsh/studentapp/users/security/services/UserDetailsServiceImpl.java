@@ -17,6 +17,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	UserRepository userRepository;
 
+
+
 	@Override
 	@Transactional
 	@Cacheable(key="#username")
